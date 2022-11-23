@@ -1,1 +1,50 @@
 # BISCUT-py3
+This is a (slightly) more user-friendly version of `BISCUT`,
+**B**reakpoint **I**dentification of **S**ignificant **C**ancer **U**ndiscovered **T**argets. The method detects genomic loci under selective pressures by analyzing partial-SCNAs
+
+This version has been tested using `R 4.1.2` and `Python 3.9.7`. 
+
+## How to run BISCUT
+### Preparing telomeric/centromeric copy number segments
+The first step is to run `BISCUT_preprocessing.py` on the input segmentation file. 
+The columns of the input should be (in order)
+```
+Sample	Chromosome	Start	End	Num_Probes	Segment_Mean
+```
+ - This is what a SNP-array based (relative) copy-number segmentation file looks like.
+ If you have your data in absolute allelic copy number format, to obtain `Segment_Mean` simply add the allelic 
+ copy numbers and divide it by the ploidy of the sample to get
+ the relative total copy number per each segment. 
+ - If the number of probes per 
+ segment does not apply to your input data (ex.,WGS-based copy numbers), set them all to `10` (anything larger than the current threshold which is `4`)
+ 
+There are a few variables that are hard-coded in the beginning of this file.
+
+ - **amplitude_threshold** - Copy number changes less than this threshold are considered noise and ignored. By default is `0.2` for impurity-corrected input (ISAR correction). We suggest using a smaller threshold (ex., `0.1`) if the input is not corrected for impurity.
+ - **chromosome_coordinates** - The coordinates of p and q arms of the human chromosomes. By default, hg-19 based coordinates provided under `\docs` directory are used. Please note these coordinates are not some clean-cut biologically well-defined regions but rather what appeared to be the boundaries of regions that can be considered telomeric and (particularly) centromeric from SNP-array based TCGA copy number profiles. You might want to use your custom set of coordinates based on your copy number profiles (ex. IGV view of start/end of event near telomere/centromere). From our experience, choosing the telomeric/centromeric boundaries wide enough so that the events are not missed due to imperfections of assaying technologies is more important than genome reference differences (ex., hg19 vs. hg38).
+ - **tumor_type** - It's used for naming input and outputs. Together with the next variable they set the name of the input seg file.
+ - **seg_file_suffix** - Any part of the input seg file name after the tumor type.
+ - **n_proc** - Number of processors to use for multi-processing over chromosome arms.
+ - **date_suffix** - It is used throughout the pipeline to uniquely name outputs.
+
+### Finding peaks and summarizing the results
+After running the pre-processing step and preparing telomeric/centromeric segments, it's time to run `BISCUT_peak_finding.R` which runs functions from multiple scripts including `Python` functions and for that you need `reticulate` package. Similar to the first step, there are a number of variables in the beginning that need to be set.
+
+ - **date_suffix** - Should be identical to one used above for the pre-processing.
+ - **tumor_type** - Should be identical to one used above for the pre-processing.
+ - **ci** - Confidence interval threshold around peaks. Higher threshold results in wider intervals around peaks. We use `0.95` as default.
+ - **qval_thres** - The threshold on q-values computed for the significance of 
+ identified peaks after correcting for multiple hypothesis testing. We use `0.05` as default.
+ - **telcent_thres** - Threshold to filter out very short or whole-arm events. It's a complimentary way besides the `chromosome coordiantes` to correct for noise in calling the copy number breakpoints. We use `0.001`, but you can increase it if you see peaks called too close to telomere/centromere that you think are not real.
+  - **USE_TCGA_BACKGROUND** - This is a switch where if set `True`, background length distributions computed using all tumors in TCGA (provided under `\docs`) are used for peak calling. By default is `FALSE` which means a new background is computed from the current data. Please refer to the section on per-lineage analysis below for more info on this.
+  - **n_cores** - Number of cpu cores to use for multi-processing finding peaks over chromosome arms.
+  - **genelocs_file** - The gene locations (hg-19 based) to generate list of genes per peaks in the output
+  - **abslocs_file** - The coordinates of p and q arms of human chromosomes (hg-19). Same files as `chromosome coordiantes` used in pre-processing.
+  
+
+### How lineage-specific analysis should be done
+Originally BISCUT code worked with a list of tumor types and iterated over them. However, it was confusing how to select/calculate the right background distribution. In this version, we have made the whole pipeline (pre-processing and peak-finding) to run on a single lineage or pan-cancer (specified by `tumor_type`).
+
+ - If you would like to do a **pan-cancer analysis**, you just need to provide all samples in a single seg file as input to the pre-processing step, and use the processed telomeric/centromeric event for peak finding, using either the TCGA background provided under `\docs`, or the one generated from your own data (`USE_TCGA_BACKGROUND` switch).
+  - If you want to to do a **per-lineage analysis**, pick a lineage one at a time, subset your seg file to only those samples, run the pipeline either with the background you have generated from all lineages, or calculate one with just that lineage if you have enough samples. Then move to the next lineage and repeat the process. This can be streamlined by for example a bash script where you loop over tumor types and provide `tumor_type` as input to `BISCUT_preprocessing.py` and `BISCUT_peak_finding.R`.
+
