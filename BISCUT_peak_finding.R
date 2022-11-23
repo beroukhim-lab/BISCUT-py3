@@ -4,7 +4,7 @@ tumor_type <- 'PANCAN'
 ci <- 0.95 # confidence interval threshold around peaks, larger -> wider peaks
 qval_thres <- 0.05 # q-value threshold for calling peaks after correcting for multiple hypothesis testing
 telcent_thres <- 10^-3 # filtering events too close to tel/cent or whole arm
-USE_TCGA_BACKGROUND <- FALSE # Whether to use background distribution from TCGA samples, or build one from the current data
+USE_BACKGROUND <- FALSE # Whether to use background distribution from TCGA samples, or build one from the current data
 n <- 1000 # number of samples for ci distribution
 bgdist <- 'beta'
 n_cores <- 8 # numbers of CPU cores for parallelization over chromosome arms
@@ -15,6 +15,8 @@ genelocs_file <- 'docs/hg19_genes_refseq_telcentfiltered_020518.txt'
 genelocs <- read.csv(genelocs_file,sep='\t',header=T)
 abslocs_file <- 'docs/SNP6_hg19_chromosome_locs_200605.txt'
 abslocs <- read.table(abslocs_file,sep='\t',header=T)
+tel_background_file <- 'docs/PANCAN_tels_200605.txt'
+cent_background_file <- 'docs/PANCAN_cents_200605.txt'
 ##################################################
 
 library(ismev)
@@ -83,11 +85,11 @@ tablify <- function(df, chromosome, pq, telcent, remove_ones = F) {
   return(tabs)
 }
 
-if (USE_TCGA_BACKGROUND) {
-  tel <- read.csv('docs/PANCAN_tels_200605.txt',sep='\t') #steph changed path
+if (USE_BACKGROUND) {
+  tel <- read.csv(tel_background_file,sep='\t')
   tel <- filter_big_small(tel)
   telemp <- tel$percent
-  cent <- read.csv('docs/PANCAN_cents_200605.txt',sep='\t') #steph changed path
+  cent <- read.csv(cent_background_file,sep='\t')
   cent <- filter_big_small(cent)
   centemp <- cent$percent
   } else {
