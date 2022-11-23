@@ -37,7 +37,7 @@ After running the pre-processing step and preparing telomeric/centromeric segmen
  identified peaks after correcting for multiple hypothesis testing. We use `0.05` as default.
  - **telcent_thres** - Threshold to filter out very short or whole-arm events. It's a complimentary way besides the `chromosome coordiantes` to correct for noise in calling the copy number breakpoints. We use `0.001`, but you can increase it if you see peaks called too close to telomere/centromere that you think are not real.
   - **USE_TCGA_BACKGROUND** - This is a switch where if set `True`, background length distributions computed using all tumors in TCGA (provided under `\docs`) are used for peak calling. By default is `FALSE` which means a new background is computed from the current data. Please refer to the section on per-lineage analysis below for more info on this.
-  - **n_cores** - Number of cpu cores to use for multi-processing finding peaks over chromosome arms.
+  - **n_cores** - Number of cpu cores to use for multi-processing peak finding over chromosome arms.
   - **genelocs_file** - The gene locations (hg-19 based) to generate list of genes per peaks in the output
   - **abslocs_file** - The coordinates of p and q arms of human chromosomes (hg-19). Same files as `chromosome coordiantes` used in pre-processing.
   
