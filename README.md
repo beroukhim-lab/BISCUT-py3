@@ -1,6 +1,6 @@
 # BISCUT-py3
 This is a (slightly) more user-friendly version of `BISCUT`,
-**B**reakpoint **I**dentification of **S**ignificant **C**ancer **U**ndiscovered **T**argets. The method detects genomic loci under selective pressures by analyzing partial-SCNAs
+**B**reakpoint **I**dentification of **S**ignificant **C**ancer **U**ndiscovered **T**argets. The method detects genomic loci under selective pressures by analyzing partial-SCNAs.
 
 This version has been tested using `R 4.1.2` and `Python 3.9.7`. 
 
