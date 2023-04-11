@@ -40,8 +40,8 @@ After running the pre-processing step and preparing telomeric/centromeric segmen
   - **tel_background_file** - The pre-computed background distribution of telomeric events. If `USE_BACKGROUND=TRUE`, BISCUT uses the background from all TCGA tumors (provided under `\docs`) unless you set this variable to a different background. See section on per-lineage analysis for more info.
   - **cent_background_file** - Same as `tel_background_file` except it's for the centromeric events. 
   - **n_cores** - Number of cpu cores to use for multi-processing peak finding over chromosome arms.
-  - **genelocs_file** - The gene locations (hg-19 based) to generate list of genes per peaks in the output
-  - **abslocs_file** - The coordinates of p and q arms of human chromosomes (hg-19). Same files as `chromosome coordiantes` used in pre-processing.
+  - **genelocs_file** - The gene locations (hg19-based) to generate list of genes per peaks in the output
+  - **abslocs_file** - The coordinates of p and q arms of human chromosomes (hg19). Same files as `chromosome coordiantes` used in pre-processing.
   
 
 ### How lineage-specific analysis should be done
