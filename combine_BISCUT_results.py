@@ -29,7 +29,7 @@ def make_table_results(folder, kspvals, qval_thres):
         if not os.path.exists(os.path.join(folder,tt,'summary')): os.mkdir(os.path.join(folder,tt,'summary'))
         li = []
         r = re.compile('iter\d.txt')
-        #x =  [i for i in os.listdir(folder+'/'+tt) if i.endswith('.txt') and not i.endswith('BrISCUT_results.txt')
+        #x =  [i for i in os.listdir(folder+'/'+tt) if i.endswith('.txt') and not i.endswith('BISCUT_results.txt')
         #      and not i.endswith('plotpeaks.txt')]
         x = list(filter(r.search,os.listdir(folder+'/'+tt))) #steph edit
         if len(x)>0:
@@ -78,7 +78,7 @@ def make_table_results(folder, kspvals, qval_thres):
 
 
             bigone = pd.concat(li)
-            bigone.to_csv(folder+'/'+tt+'/summary/'+tt+'_BrISCUT_results.txt',sep='\t',index=False)
+            bigone.to_csv(folder+'/'+tt+'/summary/'+tt+'_BISCUT_results.txt',sep='\t',index=False)
             rnk = bigone.filter(['Gene','combined_sig'])
             aprnk = bigone[(bigone['direction']=='amp')&(bigone['negpos']=='p')].filter(['Gene','combined_sig'])
             dprnk = bigone[(bigone['direction']=='del')&(bigone['negpos']=='p')].filter(['Gene','combined_sig'])
@@ -86,7 +86,7 @@ def make_table_results(folder, kspvals, qval_thres):
             dnrnk = bigone[(bigone['direction']=='del')&(bigone['negpos']=='n')].filter(['Gene','combined_sig'])
             tsrnk = pd.concat([dprnk,anrnk])
             oncrnk = pd.concat([dnrnk,aprnk])
-            names = [folder+'/'+tt+'/summary/'+tt+'_BrISCUT_results'+x+'.rnk' for x in ['','_ts-like','_onc-like','_amp-p','_del-p','_amp-n','_del-n']]
+            names = [folder+'/'+tt+'/summary/'+tt+'_BISCUT_results'+x+'.rnk' for x in ['','_ts-like','_onc-like','_amp-p','_del-p','_amp-n','_del-n']]
             for rn,n in zip([rnk,tsrnk,oncrnk,aprnk,dprnk,anrnk,dnrnk],names):
                 rnz = rn.sort_values(by = 'combined_sig',ascending=False) #steph edit
                 rnz = rnz.drop_duplicates('Gene')
@@ -94,12 +94,12 @@ def make_table_results(folder, kspvals, qval_thres):
                  #rnz.to_csv('
             alldfs.append(bigone)
     combined = pd.concat(alldfs)
-    combined.to_csv(folder+'/all_BrISCUT_results.txt',sep='\t',index=False)
+    combined.to_csv(folder+'/all_BISCUT_results.txt',sep='\t',index=False)
     kspvalsdf.to_csv(kspvals, sep='\t')
 
 def calc_overlaps(folder, genelocs_file):
     genelocs = pd.read_csv(genelocs_file,sep='\t')
-    df = pd.read_csv(folder+'/all_BrISCUT_results.txt', sep='\t')
+    df = pd.read_csv(folder+'/all_BISCUT_results.txt', sep='\t')
     armgroups = df.groupby('arm')
     #typegroups = df.groupby('type')
     s_list = []
@@ -163,8 +163,8 @@ def calc_overlaps(folder, genelocs_file):
            [i + '2' for i in ['type','start','end','direction', 'telcent', 'negpos', 'iter', 'code', 'ksby', 'combined_sig']] + ['combined_sig_sum','genes','consistent']
     dfdf = dfdf[cols]
     #print dfdf
-    dfdf.to_csv(folder+'/BrISCUT_overlaps_011320.txt', sep='\t', index=False)
-    dfdf[dfdf['consistent']==True].to_csv(folder+'/BrISCUT_overlaps_consistent_only_210319.txt',sep='\t',index=False)
+    dfdf.to_csv(folder+'/BISCUT_overlaps_011320.txt', sep='\t', index=False)
+    dfdf[dfdf['consistent']==True].to_csv(folder+'/BISCUT_overlaps_consistent_only_210319.txt',sep='\t',index=False)
     return dfdf
 
 def overlap_significance(folder, overlapsdf, abslocs_file, num_perms = 1000):
@@ -269,7 +269,7 @@ def overlap_significance(folder, overlapsdf, abslocs_file, num_perms = 1000):
 
 
     #groups = overlapsdf.groupby('arm')
-    all_results = pd.read_csv(folder+'/all_BrISCUT_results.txt', sep='\t')
+    all_results = pd.read_csv(folder+'/all_BISCUT_results.txt', sep='\t')
 
 
     # permute each type + arm separately and concat them for the comparisons
@@ -330,8 +330,8 @@ def overlap_significance(folder, overlapsdf, abslocs_file, num_perms = 1000):
     # finaldf = pd.concat(recombine)
     # finaldf = finaldf.sort('combined_sig_sum', ascending=False)
     # finaldf.to_csv('something_011420.txt', sep='\t', index=False)
-    overlapsdf.to_csv(results+'/BrISCUT_overlaps_with_permuted_sig_210319.txt', sep='\t', index=False)
-    overlapsdf[overlapsdf['consistent'] == True].to_csv(folder + '/BrISCUT_overlaps_with_permuted_sig_consistent_only_210319.txt', sep='\t',
+    overlapsdf.to_csv(results+'/BISCUT_overlaps_with_permuted_sig_210319.txt', sep='\t', index=False)
+    overlapsdf[overlapsdf['consistent'] == True].to_csv(folder + '/BISCUT_overlaps_with_permuted_sig_consistent_only_210319.txt', sep='\t',
                                             index=False)
     return overlapsdf
 
@@ -343,7 +343,7 @@ def make_column_results(folder, qval_thres):
         if not os.path.exists(os.path.join(folder,tt,'summary')): os.mkdir(os.path.join(folder,tt,'summary'))
 
         r = re.compile('iter\d.txt')
-        #x =  [i for i in os.listdir(folder+'/'+tt) if i.endswith('.txt') and not i.endswith('BrISCUT_results.txt') and not i.endswith('0.9.txt') and not i.endswith('plotpeaks.txt')]
+        #x =  [i for i in os.listdir(folder+'/'+tt) if i.endswith('.txt') and not i.endswith('BISCUT_results.txt') and not i.endswith('0.9.txt') and not i.endswith('plotpeaks.txt')]
         x =  list(filter(r.search,os.listdir(folder+'/'+tt)))
         if len(x)>0:
             li = []
@@ -355,9 +355,9 @@ def make_column_results(folder, qval_thres):
                     continue
                 if df.loc[0,'ksby'] >qval_thres:
                     continue
-                cyto =df.Cytoband.value_counts().index[0]
-                peakband = str(df.loc[0,'Chr']) + cyto
-                # peakband = 'void'
+                # cyto =df.Cytoband.value_counts().index[0]
+                # peakband = str(df.loc[0,'Chr']) + cyto
+                peakband = 'void'
                 peakloc = 'chr'+str(df.loc[0,'Chr'])+':'+str(df.loc[0,'Peak.Start'])+'-'+str(df.loc[0,'Peak.End'])
                 negpos = df.loc[0,'negpos']
                 direction = df.loc[0,'direction']
@@ -387,8 +387,8 @@ def make_column_results(folder, qval_thres):
             #print maxlen
             leftheaders = ['cytoband','peak_location','combined_sig','log10_ksby','ks_stat','n_events','direction','telomeric or centromeric','selection','code','TS or onco-like','genes']
             newdf.insert(0,'stuff',leftheaders + ([np.nan]*(maxlen-len(leftheaders))))
-            newdf.to_csv(folder+'/'+tt+'/summary/'+tt+'_BrISCUT_results_cols_'+folder.split('_')[-1]+'.txt',sep='\t',index=False,header=False)
-            newdf.to_csv(folder+'/all_cols/'+tt+'_BrISCUT_results_cols_'+folder.split('_')[-1]+'.txt',sep='\t',index=False,header=False)
+            newdf.to_csv(folder+'/'+tt+'/summary/'+tt+'_BISCUT_results_cols_'+folder.split('_')[-1]+'.txt',sep='\t',index=False,header=False)
+            newdf.to_csv(folder+'/all_cols/'+tt+'_BISCUT_results_cols_'+folder.split('_')[-1]+'.txt',sep='\t',index=False,header=False)
             list_of_cols.append((tt,newdf))
     return list_of_cols
 
@@ -398,7 +398,7 @@ def process_for_ggplot(results, qval_thres, abslocs_file):
     for tt in [i for i in os.listdir(results) if os.path.isdir(os.path.join(results,i)) and i not in ('all_cols','genes','arms')]:
         try:
             #print tt
-            df = pd.read_csv(results+'/'+tt+'/summary/'+tt+'_BrISCUT_results.txt',sep='\t')
+            df = pd.read_csv(results+'/'+tt+'/summary/'+tt+'_BISCUT_results.txt',sep='\t')
 
             df['peak_id'] = zip(df.arm, df.direction, df.telcent,
                                 df.code)
@@ -417,8 +417,8 @@ def process_for_ggplot(results, qval_thres, abslocs_file):
             df['combined_sig'] = df['log10_ksby'] * df['ks_stat']
 
             # for each peak, make a thing [xmin, xmax, ymin, ymax] [0,10,0,20]
-            df['pq'] = df['Cytoband'].str[:1]
-            # df['pq'] = 'void'
+            # df['pq'] = df['Cytoband'].str[:1]
+            df['pq'] = 'void'
             #amps
             #for tc in ['tel','cent']:
             try:
@@ -435,7 +435,7 @@ def process_for_ggplot(results, qval_thres, abslocs_file):
                     #print [xmin,xmax,ymin,ymax,color]
                     coords.append([xmin,xmax,ymin,ymax,color])
                 #if genefilter == 10000:
-                pd.DataFrame(coords).to_csv(results+'/'+tt+'/summary/'+tt+'_BrISCUT_results_for_plotting_amp.txt',sep='\t',index=False,header=False)
+                pd.DataFrame(coords).to_csv(results+'/'+tt+'/summary/'+tt+'_BISCUT_results_for_plotting_amp.txt',sep='\t',index=False,header=False)
             except:
                 pass
 
@@ -452,7 +452,7 @@ def process_for_ggplot(results, qval_thres, abslocs_file):
                     #print [xmin,xmax,ymin,ymax,color]
                     coords.append([xmin,xmax,ymin,ymax,color])
                 #if genefilter == 10000:
-                pd.DataFrame(coords).to_csv(results+'/'+tt+'/summary/'+tt+'_BrISCUT_results_for_plotting_del.txt',sep='\t',index=False,header=False)
+                pd.DataFrame(coords).to_csv(results+'/'+tt+'/summary/'+tt+'_BISCUT_results_for_plotting_del.txt',sep='\t',index=False,header=False)
             except:
                 pass
 
@@ -470,7 +470,7 @@ def process_for_ggplot(results, qval_thres, abslocs_file):
                     coords.append([xmin, xmax, ymin, ymax, color])
                 # if genefilter == 10000:
                 pd.DataFrame(coords).to_csv(
-                    results + '/' + tt + '/summary/' + tt + '_BrISCUT_results_for_plotting_pos.txt',
+                    results + '/' + tt + '/summary/' + tt + '_BISCUT_results_for_plotting_pos.txt',
                     sep='\t', index=False, header=False)
             except:
                 pass
@@ -490,7 +490,7 @@ def process_for_ggplot(results, qval_thres, abslocs_file):
                     coords.append([xmin, xmax, ymin, ymax, color])
                 # if genefilter == 10000:
                 pd.DataFrame(coords).to_csv(
-                    results + '/' + tt + '/summary/' + tt + '_BrISCUT_results_for_plotting_neg.txt',
+                    results + '/' + tt + '/summary/' + tt + '_BISCUT_results_for_plotting_neg.txt',
                     sep='\t', index=False, header=False)
             except:
                 pass
@@ -505,7 +505,7 @@ def process_for_ggplot_jagged(results, qval_thres, abslocs_file):
     for tt in [i for i in next(os.walk(results))[1] if i not in ['stats','all_cols','arms','genes']]:
         #print tt
         try:
-            df = pd.read_csv(results + '/' + tt + '/summary/' + tt + '_BrISCUT_results.txt', sep='\t')
+            df = pd.read_csv(results + '/' + tt + '/summary/' + tt + '_BISCUT_results.txt', sep='\t')
 
             df['peak_id'] = zip(df.arm, df.direction, df.telcent,
                                 df.code)
@@ -526,8 +526,8 @@ def process_for_ggplot_jagged(results, qval_thres, abslocs_file):
             #print fullname
 
             # for each peak, make a thing [xmin, xmax, ymin, ymax] [0,10,0,20]
-            df['pq'] = df['Cytoband'].str[:1]
-            # df['pq'] = 'void'
+            # df['pq'] = df['Cytoband'].str[:1]
+            df['pq'] = 'void'
 
             ampfilltel = []
             delfilltel = []
@@ -575,22 +575,22 @@ def process_for_ggplot_jagged(results, qval_thres, abslocs_file):
             #print 'printing' + tt
             #if genefilter==10000:
             try:
-                pd.concat(ampfilltel).to_csv(results + '/' + tt + '/summary/' + tt + '_BrISCUT_results_for_jagged_plotting_amp_tel.txt',
+                pd.concat(ampfilltel).to_csv(results + '/' + tt + '/summary/' + tt + '_BISCUT_results_for_jagged_plotting_amp_tel.txt',
                                         sep='\t', index=False, header=False)
             except:
                 pass
             try:
-                pd.concat(ampfillcent).to_csv(results + '/' + tt + '/summary/' + tt + '_BrISCUT_results_for_jagged_plotting_amp_cent.txt',
+                pd.concat(ampfillcent).to_csv(results + '/' + tt + '/summary/' + tt + '_BISCUT_results_for_jagged_plotting_amp_cent.txt',
                                         sep='\t', index=False, header=False)
             except:
                 pass
             try:
-                pd.concat(delfilltel).to_csv(results + '/' + tt + '/summary/' + tt + '_BrISCUT_results_for_jagged_plotting_del_tel.txt',
+                pd.concat(delfilltel).to_csv(results + '/' + tt + '/summary/' + tt + '_BISCUT_results_for_jagged_plotting_del_tel.txt',
                                         sep='\t', index=False, header=False)
             except:
                 pass
             try:
-                pd.concat(delfillcent).to_csv(results + '/' + tt + '/summary/' + tt + '_BrISCUT_results_for_jagged_plotting_del_cent.txt',
+                pd.concat(delfillcent).to_csv(results + '/' + tt + '/summary/' + tt + '_BISCUT_results_for_jagged_plotting_del_cent.txt',
                                         sep='\t', index=False, header=False)
             except:
                 pass
@@ -644,28 +644,28 @@ def process_for_ggplot_jagged(results, qval_thres, abslocs_file):
                 #print posdf
                 #print negdf
 
-                # posdf.to_csv(results+'/'+tt+'/summary/'+tt+'_BrISCUT_results_for_jagged_plotting_pos_'+tc+'.txt',sep='\t',index=False,header=False)
-                # negdf.to_csv(results+'/'+tt+'/summary/'+tt+'_BrISCUT_results_for_jagged_plotting_neg_'+tc+'.txt',sep='\t',index=False,header=False)
-                # pd.concat([posdf,negdf]).to_csv(results+'/'+tt+'/summary/'+tt+'_BrISCUT_results_for_jagged_plotting_posneg_'+tc+'.txt',sep='\t',index=False,header=False)
+                # posdf.to_csv(results+'/'+tt+'/summary/'+tt+'_BISCUT_results_for_jagged_plotting_pos_'+tc+'.txt',sep='\t',index=False,header=False)
+                # negdf.to_csv(results+'/'+tt+'/summary/'+tt+'_BISCUT_results_for_jagged_plotting_neg_'+tc+'.txt',sep='\t',index=False,header=False)
+                # pd.concat([posdf,negdf]).to_csv(results+'/'+tt+'/summary/'+tt+'_BISCUT_results_for_jagged_plotting_posneg_'+tc+'.txt',sep='\t',index=False,header=False)
 
                 #if genefilter == 10000:
                 posdf.to_csv(
-                    results + '/' + tt + '/summary/' + tt + '_BrISCUT_results_for_jagged_plotting_pos_' + tc + '.txt',
+                    results + '/' + tt + '/summary/' + tt + '_BISCUT_results_for_jagged_plotting_pos_' + tc + '.txt',
                     sep='\t', index=False, header=False)
                 negdf.to_csv(
-                    results + '/' + tt + '/summary/' + tt + '_BrISCUT_results_for_jagged_plotting_neg_' + tc + '.txt',
+                    results + '/' + tt + '/summary/' + tt + '_BISCUT_results_for_jagged_plotting_neg_' + tc + '.txt',
                     sep='\t', index=False, header=False)
                 pd.concat([posdf, negdf]).to_csv(
-                    results + '/' + tt + '/summary/' + tt + '_BrISCUT_results_for_jagged_plotting_posneg_' + tc + '.txt',
+                    results + '/' + tt + '/summary/' + tt + '_BISCUT_results_for_jagged_plotting_posneg_' + tc + '.txt',
                     sep='\t', index=False, header=False)
 def make_all_peaks(results, qval_thres):
     cancer = pd.read_csv('cancer_genes_030718.txt', sep='\t', index_col='Unnamed: 0')
     for tt in os.listdir(results):
         try:
-            briscut = pd.read_csv(results + '/' + tt + '/' + tt + '_BrISCUT_results.txt', sep='\t')
-            briscut = briscut[briscut['ksby'] <= qval_thres]
-            briscut['log10_ksby'] = briscut['log10_ksby'].replace({np.inf: 16})
-            groups = briscut.groupby(['arm', 'direction', 'code'])
+            BISCUT = pd.read_csv(results + '/' + tt + '/' + tt + '_BISCUT_results.txt', sep='\t')
+            BISCUT = BISCUT[BISCUT['ksby'] <= qval_thres]
+            BISCUT['log10_ksby'] = BISCUT['log10_ksby'].replace({np.inf: 16})
+            groups = BISCUT.groupby(['arm', 'direction', 'code'])
 
             allgenes = []
             allcancergenes = []
@@ -682,8 +682,8 @@ def make_all_peaks(results, qval_thres):
                     color = lightred
                 elif direction == 'amp' and negpos == 'p':
                     color = darkred
-                cyto = df.Cytoband.value_counts().index[0]
-                # cyto = 'void'
+                # cyto = df.Cytoband.value_counts().index[0]
+                cyto = 'void'
                 genes = df['Gene'].tolist()
                 peakloc = 'chr' + str(df['Chr'].tolist()[0]) + ':' + str(df['Peak.Start'].tolist()[0]) + '-' + str(
                     df['Peak.End'].tolist()[0])
@@ -716,20 +716,20 @@ def make_all_peaks(results, qval_thres):
                           'all_genes','n_total_genes','driver_genes','n_driver_genes','driver_gene_points','max_driver_gene_points',
                           'driver_score']]
             newdf = newdf.sort_values('combined_sig',ascending=False)
-            newdf.to_csv(results + '/' + tt + '/summary/' + tt + '_BrISCUT_results_all_peaks.txt', sep='\t', index_label='combo')
+            newdf.to_csv(results + '/' + tt + '/summary/' + tt + '_BISCUT_results_all_peaks.txt', sep='\t', index_label='combo')
 
         except:
             pass
 
-def filter_BrISCUT_knowngenes(folder, genes):
-    df = pd.read_csv(folder+'/all_BrISCUT_results.txt',sep='\t')
+def filter_BISCUT_knowngenes(folder, genes):
+    df = pd.read_csv(folder+'/all_BISCUT_results.txt',sep='\t')
     if not os.path.exists(os.path.join(folder,'genes')): os.mkdir(os.path.join(folder,'genes'))
     if not os.path.exists(os.path.join(folder,'genes','files')): os.mkdir(os.path.join(folder,'genes','files'))
     for g in genes:
         try:
             minidf = df[df['Gene']==g]
             minidf = minidf.sort_values(by=['combined_sig','n_events'],ascending=[False,False])
-            minidf.to_csv(folder+'/genes/files/'+g+'_BrISCUT_results.txt',sep='\t',index=False)
+            minidf.to_csv(folder+'/genes/files/'+g+'_BISCUT_results.txt',sep='\t',index=False)
             minidf = minidf.reset_index(drop=True)
 
             def colors(x):
@@ -750,12 +750,12 @@ def filter_BrISCUT_knowngenes(folder, genes):
             truncdf = truncdf.reset_index(drop=True)
             truncdf['ymax'] = (-truncdf.index)-0.1
             truncdf['ymin'] = (-truncdf.index)-1
-            truncdf.to_csv(folder+'/genes/files/'+g+'_BrISCUT_fig2.txt',sep='\t',index=False)
+            truncdf.to_csv(folder+'/genes/files/'+g+'_BISCUT_fig2.txt',sep='\t',index=False)
         except:
             pass
 
-def filter_BrISCUT_arms(folder, arms):
-    df = pd.read_csv(folder+'/all_BrISCUT_results.txt',sep='\t')
+def filter_BISCUT_arms(folder, arms):
+    df = pd.read_csv(folder+'/all_BISCUT_results.txt',sep='\t')
     if not os.path.exists(os.path.join(folder,'arms')): os.mkdir(os.path.join(folder,'arms'))
     if not os.path.exists(os.path.join(folder,'arms','files')): os.mkdir(os.path.join(folder,'arms','files'))
     for g in arms:
@@ -769,8 +769,8 @@ def filter_BrISCUT_arms(folder, arms):
             minidf = minidf[minidf['negpos']==c[1]]
             minidf = minidf.sort_values(by=['combined_sig','n_events'],ascending=[False,False])
            #includes multiple iterations
-            minidf.to_csv(folder+'/arms/files/'+g+'/'+g+'_'+c[0]+'_'+c[1]+'_multiter_BrISCUT_results.txt',sep='\t',index=False)
-            arm_dic[c]['_multiter_BrISCUT_results'] = minidf
+            minidf.to_csv(folder+'/arms/files/'+g+'/'+g+'_'+c[0]+'_'+c[1]+'_multiter_BISCUT_results.txt',sep='\t',index=False)
+            arm_dic[c]['_multiter_BISCUT_results'] = minidf
 
             minidf = minidf.reset_index(drop=True)
             if minidf.empty:
@@ -792,36 +792,36 @@ def filter_BrISCUT_arms(folder, arms):
             truncdf = truncdf.reset_index(drop=True)
             truncdf['ymax'] = (-truncdf.index)-0.1
             truncdf['ymin'] = (-truncdf.index)-1
-            truncdf.to_csv(folder+'/arms/files/'+g+'/'+g+'_'+c[0]+'_'+c[1]+'_multiter_BrISCUT_fig2.txt',sep='\t',index=False)
-            arm_dic[c]['_multiter_BrISCUT_fig2'] = truncdf
+            truncdf.to_csv(folder+'/arms/files/'+g+'/'+g+'_'+c[0]+'_'+c[1]+'_multiter_BISCUT_fig2.txt',sep='\t',index=False)
+            arm_dic[c]['_multiter_BISCUT_fig2'] = truncdf
 
             truncdf = truncdf[~truncdf.code.str[:-2].str.contains(c[1])]
             truncdf = truncdf.reset_index(drop=True)
             truncdf['ymax'] = (-truncdf.index)-0.1
             truncdf['ymin'] = (-truncdf.index)-1
-            truncdf.to_csv(folder+'/arms/files/'+g+'/'+g+'_'+c[0]+'_'+c[1]+'_firstiter_BrISCUT_fig2.txt',sep='\t',index=False)
-            arm_dic[c]['_firstiter_BrISCUT_fig2'] = truncdf
+            truncdf.to_csv(folder+'/arms/files/'+g+'/'+g+'_'+c[0]+'_'+c[1]+'_firstiter_BISCUT_fig2.txt',sep='\t',index=False)
+            arm_dic[c]['_firstiter_BISCUT_fig2'] = truncdf
 
 
             truncdf = truncdf[truncdf['code']==c[1]]
             truncdf = truncdf.reset_index(drop=True)
             truncdf['ymax'] = (-truncdf.index)-0.1
             truncdf['ymin'] = (-truncdf.index)-1
-            truncdf.to_csv(folder+'/arms/files/'+g+'/'+g+'_'+c[0]+'_'+c[1]+'_BrISCUT_fig2.txt',sep='\t',index=False)
-            arm_dic[c]['_BrISCUT_fig2'] = truncdf
+            truncdf.to_csv(folder+'/arms/files/'+g+'/'+g+'_'+c[0]+'_'+c[1]+'_BISCUT_fig2.txt',sep='\t',index=False)
+            arm_dic[c]['_BISCUT_fig2'] = truncdf
 
            #filters out multiple iterations
             minidf = minidf[~minidf.code.str[:-2].str.contains(c[1])]
-            minidf.to_csv(folder+'/arms/files/'+g+'/'+g+'_'+c[0]+'_'+c[1]+'_firstiter_BrISCUT_results.txt',sep='\t',index=False)
-            arm_dic[c]['_firstiter_BrISCUT_results'] = minidf
+            minidf.to_csv(folder+'/arms/files/'+g+'/'+g+'_'+c[0]+'_'+c[1]+'_firstiter_BISCUT_results.txt',sep='\t',index=False)
+            arm_dic[c]['_firstiter_BISCUT_results'] = minidf
 
 
             minidf = minidf[minidf['code']==c[1]]
-            minidf.to_csv(folder+'/arms/files/'+g+'/'+g+'_'+c[0]+'_'+c[1]+'_BrISCUT_results.txt',sep='\t',index=False)
-            arm_dic[c]['_BrISCUT_results'] = minidf
+            minidf.to_csv(folder+'/arms/files/'+g+'/'+g+'_'+c[0]+'_'+c[1]+'_BISCUT_results.txt',sep='\t',index=False)
+            arm_dic[c]['_BISCUT_results'] = minidf
         #print g
         #print arm_dic
-        for d in ['_multiter_BrISCUT_results','_multiter_BrISCUT_fig2','_firstiter_BrISCUT_fig2','_BrISCUT_fig2','_firstiter_BrISCUT_results','_BrISCUT_results']:
+        for d in ['_multiter_BISCUT_results','_multiter_BISCUT_fig2','_firstiter_BISCUT_fig2','_BISCUT_fig2','_firstiter_BISCUT_results','_BISCUT_results']:
             for c in [('amp','n'),('del','n'),('amp','p'),('del','p')]:
                 if d not in arm_dic[c]:
                     arm_dic[c][d] = pd.DataFrame()
@@ -868,7 +868,7 @@ def extract_cols(folder, lop, arms):
  #       df = df.transpose()
         leftheaders = ['tumor_type','cytoband','peak_location','combined_sig','log10_ksby','ks_stat','n_events','direction','telcent','selection','code','TS or onco-like','genes']
         df.insert(0,'stuff',leftheaders + ([np.nan]*(df.shape[0]-len(leftheaders))))
-        df.to_csv(os.path.join(folder,'arms','cols',a+'_BrISCUT_results_cols_'+folder.split('_')[-1]+'.txt'),sep='\t',index=False,header=False)
+        df.to_csv(os.path.join(folder,'arms','cols',a+'_BISCUT_results_cols_'+folder.split('_')[-1]+'.txt'),sep='\t',index=False,header=False)
 
 
 def all_processing(date, ci, qval_thres, genes, arms, genelocs_file, abslocs_file):
@@ -881,6 +881,6 @@ def all_processing(date, ci, qval_thres, genes, arms, genelocs_file, abslocs_fil
     process_for_ggplot(folder, qval_thres, abslocs_file)
     process_for_ggplot_jagged(folder, qval_thres, abslocs_file)
     #make_all_peaks(folder, qval_thres)
-    filter_BrISCUT_knowngenes(folder, genes)
-    filter_BrISCUT_arms(folder,arms)
+    filter_BISCUT_knowngenes(folder, genes)
+    filter_BISCUT_arms(folder,arms)
     extract_cols(folder,lop,arms)
