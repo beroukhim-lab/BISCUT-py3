@@ -1,3 +1,5 @@
+[![DOI](https://zenodo.org/badge/558464969.svg)](https://zenodo.org/badge/latestdoi/558464969)
+
 # BISCUT-py3
 This is a (slightly) more user-friendly version of `BISCUT`,
 **B**reakpoint **I**dentification of **S**ignificant **C**ancer **U**ndiscovered **T**argets. The method detects genomic loci under selective pressures by analyzing partial-SCNAs.
