@@ -355,9 +355,9 @@ def make_column_results(folder, qval_thres):
                     continue
                 if df.loc[0,'ksby'] >qval_thres:
                     continue
-                # cyto =df.Cytoband.value_counts().index[0]
-                # peakband = str(df.loc[0,'Chr']) + cyto
-                peakband = 'void'
+                cyto =df.Cytoband.value_counts().index[0]
+                peakband = str(df.loc[0,'Chr']) + cyto
+                # peakband = 'void'
                 peakloc = 'chr'+str(df.loc[0,'Chr'])+':'+str(df.loc[0,'Peak.Start'])+'-'+str(df.loc[0,'Peak.End'])
                 negpos = df.loc[0,'negpos']
                 direction = df.loc[0,'direction']
@@ -417,8 +417,8 @@ def process_for_ggplot(results, qval_thres, abslocs_file):
             df['combined_sig'] = df['log10_ksby'] * df['ks_stat']
 
             # for each peak, make a thing [xmin, xmax, ymin, ymax] [0,10,0,20]
-            # df['pq'] = df['Cytoband'].str[:1]
-            df['pq'] = 'void'
+            df['pq'] = df['Cytoband'].str[:1]
+            # df['pq'] = 'void'
             #amps
             #for tc in ['tel','cent']:
             try:
@@ -526,8 +526,8 @@ def process_for_ggplot_jagged(results, qval_thres, abslocs_file):
             #print fullname
 
             # for each peak, make a thing [xmin, xmax, ymin, ymax] [0,10,0,20]
-            # df['pq'] = df['Cytoband'].str[:1]
-            df['pq'] = 'void'
+            df['pq'] = df['Cytoband'].str[:1]
+            # df['pq'] = 'void'
 
             ampfilltel = []
             delfilltel = []
@@ -682,8 +682,8 @@ def make_all_peaks(results, qval_thres):
                     color = lightred
                 elif direction == 'amp' and negpos == 'p':
                     color = darkred
-                # cyto = df.Cytoband.value_counts().index[0]
-                cyto = 'void'
+                cyto = df.Cytoband.value_counts().index[0]
+                # cyto = 'void'
                 genes = df['Gene'].tolist()
                 peakloc = 'chr' + str(df['Chr'].tolist()[0]) + ':' + str(df['Peak.Start'].tolist()[0]) + '-' + str(
                     df['Peak.End'].tolist()[0])
