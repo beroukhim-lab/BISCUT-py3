@@ -368,9 +368,13 @@ def make_column_results(folder, qval_thres):
                 sig = df.loc[0,'ks_stat']
                 combinedsig = df.loc[0,'log10_ksby'] * df.loc[0,'ks_stat']
                 code = df.loc[0,'code']
-                if (direction=='del' and negpos == 'p') or (direction=='amp' and negpos == 'n'):
+                if (direction=='del' and negpos == 'p'):
                     supposed = 'TS-like'
-                else:
+                elif (direction=='del' and negpos == 'n'):
+                    supposed = 'essential-like'
+                elif (direction=='amp' and negpos == 'n'):
+                    supposed = 'toxic-like'
+                elif (direction=='amp' and negpos == 'p'):
                     supposed='onco-like'
 
                 thelist = [peakband, peakloc, combinedsig, log10ksby, sig, n_events, direction, telcent,negpos, code,supposed] +genes
