@@ -10,7 +10,6 @@ bgdist <- 'beta'
 n_cores <- 8 # numbers of CPU cores for parallelization over chromosome arms
 set.seed(123456789) #random seed
 
-setwd("/Users/ssarmash/opt/BISCUT-py3/")
 genelocs_file <- 'docs/hg19_genes_refseq_telcentfiltered_020518.txt'
 genelocs <- read.csv(genelocs_file,sep='\t',header=T)
 abslocs_file <- 'docs/SNP6_hg19_chromosome_locs_200605.txt'
