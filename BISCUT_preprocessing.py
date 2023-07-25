@@ -1,5 +1,13 @@
 #!/usr/bin/env python
 
+### Author: Juliann Shih, jshih@broadinstitute.org
+### Contact: Rameen Beroukhim, rameen_beroukhim@dfci.harvard.edu
+### Date last updated: July 24, 2023
+
+### License: GNU GPL2, Copyright (C) 2023 Dana-Farber Cancer Institute
+### Dependencies: tested using R 4.1 and Python 3.9
+### See README for guide on how to run this package
+
 __author__ = 'jshih'
 
 import pandas as pd
