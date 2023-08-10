@@ -490,7 +490,7 @@ do_arm_gistic <- function(arm,tt,direc,telcent,mode,prefix=NULL,leftright=NULL,d
   #print(probelist)
   sorted_probelist<-probelist[order(probelist)]
   left_closest_index <- which(abs(sorted_probelist-left_boundary_coord)==min(abs(sorted_probelist-left_boundary_coord)))
-  print(left_closest_index)
+  #print(left_closest_index)
   if(left_boundary_coord!= sorted_probelist[left_closest_index]) {
     left_boundary_coord <- sorted_probelist[left_closest_index-1][1]
     } else {
@@ -498,7 +498,7 @@ do_arm_gistic <- function(arm,tt,direc,telcent,mode,prefix=NULL,leftright=NULL,d
   }
 
   right_closest_index <- which(abs(sorted_probelist-right_boundary_coord)==min(abs(sorted_probelist-right_boundary_coord)))
-  print(right_closest_index)
+  #print(right_closest_index)
   if(right_boundary_coord!= sorted_probelist[right_closest_index]) {
     right_boundary_coord <- sorted_probelist[right_closest_index+1][1]
   } else {
@@ -590,8 +590,8 @@ do_arm_gistic <- function(arm,tt,direc,telcent,mode,prefix=NULL,leftright=NULL,d
   if(mode=='overlap') {
     rightdf <- df1[vector_of_interest>left_boundary,]
     leftdf <- df1[vector_of_interest<right_boundary,]
-    print(prior_peaks)
-    print(left_boundary, right_boundary)
+    #print(prior_peaks)
+    #print(left_boundary, right_boundary)
     if(check_overlaps(prior_peaks,c(left_boundary,right_boundary))) {
       stop('repeat found!')
     }
