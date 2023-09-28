@@ -14,12 +14,12 @@ The columns of the input should be (in order)
 ```
 Sample	Chromosome	Start	End	Num_Probes	Segment_Mean
 ```
- - This is what a SNP-array based (relative) copy-number segmentation file looks like.
- If you have your data in absolute allelic copy number format, to obtain `Segment_Mean` simply add the allelic 
- copy numbers and divide it by the ploidy of the sample to get
- the relative total copy number per each segment. 
- - If the number of probes per 
- segment does not apply to your input data (ex.,WGS-based copy numbers), set them all to `10` (anything larger than the current threshold which is `4`)
+ - This is what a SNP-array based (relative) copy-number segmentation file looks like. `Segment_Mean` is assumed
+   to be in log2ratio scale. If you have your data in absolute allelic copy number format, to obtain `Segment_Mean`
+   simply add the allelic copy numbers and divide it by the ploidy of the sample and take log2 to get
+   the relative total copy number per each segment (in log2 scale where amplificaitons are positive and deletions are negative). 
+ - If the number of probes per segment does not apply to your input data (ex.,WGS-based copy numbers),
+   set them all to `10` (anything larger than the current threshold which is `4`)
  
 There are a few variables that are hard-coded in the beginning of this file.
 
