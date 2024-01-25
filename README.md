@@ -1,7 +1,7 @@
 [![DOI](https://zenodo.org/badge/558464969.svg)](https://zenodo.org/badge/latestdoi/558464969)
 
 # BISCUT-py3
-This is a (slightly) more user-friendly version of `BISCUT`,
+This is a the current version of `BISCUT`,
 **B**reakpoint **I**dentification of **S**ignificant **C**ancer **U**ndiscovered **T**argets. The method detects genomic loci under selective pressures by analyzing partial-SCNAs. The paper where we describe the method and the results of applying it to ~11,000 TCGA tumors:
  - [Shih, J., Sarmashghi, S., Zhakula-Kostadinova, N. et al. Cancer aneuploidies are shaped primarily by effects on tumour fitness. Nature (2023). https://doi.org/10.1038/s41586-023-06266-3][biscut-paper]
 
