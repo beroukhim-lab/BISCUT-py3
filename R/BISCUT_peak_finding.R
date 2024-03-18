@@ -39,16 +39,19 @@
 #'   (ex., hg19 vs. hg38).
 #' @param gene_locations Gene locations for mapping genes to peaks in the output. By default, an hg19-based
 #' table is used; see \code{get_gene_locations()}.
+#' @param seed Default NULL; supply an integer seed to make numerical output reproducible.
 #' @export
 do_biscut = function(breakpoint_file_dir, results_dir, use_precalculated_background = FALSE,
                      telcent_thres = 1e-3, ci = .95, n_bootstrap = 1000, qval_thres = .05, cores = 1,
                      arms = get_chromosome_arms(), chromosome_coordinates = get_chromosome_coordinates(), 
-                     gene_locations = get_gene_locations()) {
+                     gene_locations = get_gene_locations(), seed = NULL) {
   bgdist <- 'beta'
   
-  # This call should probably be removed, leaving it to the user to call set.seed before running
-  # if they desire reproducibility of results.
-  set.seed(123456789) 
+  if(! is.null(seed)) {
+    if(! rlang::is_integerish(seed) || length(seed) != 1) {
+      stop('seed should be an integer (or left NULL).')
+    }
+  }
   
   if(! rlang::is_bool(use_precalculated_background)) {
     stop('use_precalculated_background should be TRUE/FALSE.')
@@ -82,6 +85,7 @@ do_biscut = function(breakpoint_file_dir, results_dir, use_precalculated_backgro
     tel = custom_background_data$tel
     cent = custom_background_data$cent
   }
+  
   
   if(! rlang::is_scalar_integerish(cores) || ! is.finite(cores) || cores < 1) {
     stop('cores should be positive integer')
@@ -133,7 +137,6 @@ do_biscut = function(breakpoint_file_dir, results_dir, use_precalculated_backgro
   fit_by_type[['amp']][['cent']] = fitdistrplus::fitdist(ampcentemp, bgdist)
   fit_by_type[['del']][['cent']] = fitdistrplus::fitdist(delcentemp, bgdist)
   
-  
   if(! dir.create(results_dir)) {
     stop('Could not create results_dir.')
   }
@@ -156,12 +159,18 @@ do_biscut = function(breakpoint_file_dir, results_dir, use_precalculated_backgro
   
   message("Running BISCUT...")
   run_args = expand.grid(d = c('amp', 'del'), tc =c('cent', 'tel'), a = arms, stringsAsFactors = FALSE)
+  if(! is.null(seed)) {
+    seed = set.seed(seed)
+    seeds = sample(1:1e7, size = nrow(run_args), replace = FALSE)
+    run_args$seed = seeds
+  }
   results = pbapply::pblapply(1:nrow(run_args),
                                  function(i) {
                                    direc = run_args$d[i]
                                    telcent = run_args$tc[i]
                                    emp = emp_by_type[[direc]][[telcent]]
                                    fit = fit_by_type[[direc]][[telcent]]
+                                   seed = run_args$seed[i]
                                    do_arm_gistic(arm = run_args$a[i],
                                                  direc = direc,
                                                  telcent = telcent,
@@ -174,7 +183,8 @@ do_biscut = function(breakpoint_file_dir, results_dir, use_precalculated_backgro
                                                  emp_bg = list(emp = emp, fit = fit),
                                                  results_dir = results_dir,
                                                  abslocs = abslocs,
-                                                 genelocs = genelocs)
+                                                 genelocs = genelocs,
+                                                 seed = seed)
                                  }, cl = cores)
   which_failed = which(! sapply(results, is.data.table))
   if(length(which_failed) > 0) {
@@ -223,6 +233,7 @@ do_biscut = function(breakpoint_file_dir, results_dir, use_precalculated_backgro
   results[direction == 'amp' & negpos == 'n', type_of_selection := 'toxic-like']
   results[, peak_interval := paste0(Chr, ':', Peak.Start, '-', Peak.End)]
   setcolorder(results, c('peak_id', 'code', 'peak_interval'))
+  results = results[order(-combined_sig)]
   
   fwrite(results, paste0(results_dir, '/all_BISCUT_results.txt'), sep = "\t")
   
@@ -340,5 +351,14 @@ do_biscut = function(breakpoint_file_dir, results_dir, use_precalculated_backgro
   }
   
   finished_processing = TRUE
+  
+  peak_info = results[! duplicated(peak_id), .(peak_id, peak_interval, type_of_selection, combined_sig, 
+                                   Chr, Peak.Start, Peak.End, Peak.Start.1, Peak.End.1,
+                                   n_events, n_right, n_left, code, negpos, iter, arm, direction, telcent,
+                                   ks_stat, log10_ks_p, log10_ksby)]
+  gene_cols = setdiff(names(results), c(names(peak_info), c('conf', 'ksby', 'ks_p')))
+  genes_by_peak = results[, .SD, .SDcols = c('peak_id', gene_cols, 'combined_sig')][order(-combined_sig, Start)]
+  setnames(genes_by_peak, 'combined_sig', 'peak_combined_sig')
+  return(list(peaks = peak_info, genes_by_peak = genes_by_peak, background_fits = fit_by_type))
 }
 

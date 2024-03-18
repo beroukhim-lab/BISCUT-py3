@@ -100,11 +100,6 @@ validate_chr_coordinates = function(chromosome_coordinates) {
   chromosome_coordinates$offset = c(0, cumsum(as.numeric(chromosome_coordinates$size[1:(nrow(chromosome_coordinates) - 1)])))
   chromosome_coordinates$middle_of_arm = ceiling(chromosome_coordinates$offset + chromosome_coordinates$size/2)
   chromosome_coordinates$q_end1 = cumsum(as.numeric(chromosome_coordinates$size))
-  
-  # Should it be chromosome_coordinates$q_start instead of chromosome_coordinates$centromere?
-  # If so, this would eliminate the need for a centromere column.
-  
-  # abslocs: q_end1 = q_start1 (2409817111) for chr15. For all other chr, q_start = centromere + offset
   chromosome_coordinates$q_start1 = chromosome_coordinates$centromere + chromosome_coordinates$offset
   return(as.data.frame(chromosome_coordinates))
 }

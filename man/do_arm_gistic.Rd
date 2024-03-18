@@ -17,7 +17,8 @@ do_arm_gistic(
   emp_bg,
   results_dir,
   abslocs,
-  genelocs
+  genelocs,
+  seed = NULL
 )
 }
 \description{

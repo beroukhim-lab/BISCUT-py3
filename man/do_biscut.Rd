@@ -15,7 +15,8 @@ do_biscut(
   cores = 1,
   arms = get_chromosome_arms(),
   chromosome_coordinates = get_chromosome_coordinates(),
-  gene_locations = get_gene_locations()
+  gene_locations = get_gene_locations(),
+  seed = NULL
 )
 }
 \arguments{
@@ -58,6 +59,8 @@ to imperfections of assaying technologies is more important than genome referenc
 
 \item{gene_locations}{Gene locations for mapping genes to peaks in the output. By default, an hg19-based
 table is used; see \code{get_gene_locations()}.}
+
+\item{seed}{Default NULL; supply an integer seed to make numerical output reproducible.}
 }
 \description{
 Run BISCUT analysis on processed arm breakpoint files

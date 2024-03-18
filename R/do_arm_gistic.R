@@ -2,7 +2,10 @@
 #' 
 #' @keywords internal
 do_arm_gistic <- function(arm, direc, telcent, mode, ci,qval_thres, telcent_thres, breakpoint_file_dir, n,
-                          emp_bg, results_dir, abslocs, genelocs) {
+                          emp_bg, results_dir, abslocs, genelocs, seed = NULL) {
+  if(! is.null(seed)) {
+    set.seed(seed)
+  }
   chromosome = as.integer(sub('[pq]$', '', arm))
   pq = substr(arm, nchar(arm), nchar(arm))
   pq = ifelse(pq %in% c('p', 'q'), pq, 'q') # acrocentromeric chromosomes lack p/q in arm name; always q
@@ -111,7 +114,7 @@ do_arm_gistic <- function(arm, direc, telcent, mode, ci,qval_thres, telcent_thre
     else return('negative')
   }
   
-  find_peaks = function(leftright, df1, lims, x, prior_peaks, curr_chain, prefix, iteration) {
+  find_peaks = function(leftright, df1, lims, x, prior_peaks, prefix, iteration) {
     # Search for peak, put in peak list
     # If found:
     #   results_left = Search left (list)
@@ -147,7 +150,7 @@ do_arm_gistic <- function(arm, direc, telcent, mode, ci,qval_thres, telcent_thre
     }
     curemp <- emp[(emp<=highlim)&(emp>=lowlim)]
     
-    # ks.test; will muffle the p-value warning
+    # Get significance with ks.test; suppress the approximate p-value warning.
     theks <- withCallingHandlers(ks.test(df1$percent, curemp),
                                  warning = function(w) {
                                    if (grepl("p-value will be approximate in the presence of ties", conditionMessage(w))) {
