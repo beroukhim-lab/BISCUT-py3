@@ -319,7 +319,7 @@ do_biscut = function(breakpoint_file_dir, results_dir, use_precalculated_backgro
   
   write_plot_data = function(dt, name, neg_color, pos_color) {
     if(dt[, .N] == 0) {
-      return()
+      return(data.table())
     }
     output_file = paste0(plot_dir, '/plot_data_', name, '.txt')
     dt[pmin(ymin, ymax) < 0, color := neg_color]
