@@ -324,14 +324,14 @@ do_biscut = function(breakpoint_file_dir, results_dir, use_precalculated_backgro
   neg_data = write_plot_data(for_plots[negpos == 'n'], name = 'neg', neg_color = lightred, pos_color = lightblue)
   
   xlab1 = "Significance\nnegative selection <----------------------------------------------> positive selection"
-  amp_plot = plot_BISCUT_results(amp_data, title = 'Amplifications', xlab = xlab1, abslocs = abslocs)
-  del_plot = plot_BISCUT_results(del_data, title = 'Deletions', xlab = xlab1, abslocs = abslocs)
+  amp_plot = plot_BISCUT_results(amp_data, title = 'Amplifications', xlab = xlab1, chromosome_coordinates = abslocs)
+  del_plot = plot_BISCUT_results(del_data, title = 'Deletions', xlab = xlab1, chromosome_coordinates  = abslocs)
   
   xlab2 = "Significance\nessential-like <----------------------------------------------> toxic-like"
-  neg_plot = plot_BISCUT_results(neg_data, title = 'Negative Selection', xlab = xlab2, abslocs = abslocs)
+  neg_plot = plot_BISCUT_results(neg_data, title = 'Negative Selection', xlab = xlab2, chromosome_coordinates = abslocs)
   
   xlab3 = "Significance\ntumor-suppressor-like <----------------------------------------------> oncogene-like"
-  pos_plot = plot_BISCUT_results(pos_data, title = 'Positive Selection', xlab = xlab3, abslocs = abslocs)
+  pos_plot = plot_BISCUT_results(pos_data, title = 'Positive Selection', xlab = xlab3, chromosome_coordinates = abslocs)
   
   if(amp_data[, .N] > 0) {
     cowplot::save_plot(filename = paste0(plot_dir, '/BISCUT_peaks_', 'amplifications.pdf'), amp_plot,

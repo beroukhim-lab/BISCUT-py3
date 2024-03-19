@@ -8,12 +8,20 @@ plot_BISCUT_results(
   plot_data,
   title,
   xlab,
-  abslocs = get_chromosome_coordinates()
+  chromosome_coordinates = get_chromosome_coordinates()
 )
 }
 \arguments{
 \item{plot_data}{A data.table (or data.frame) with peak plotting information. For format, see the
 text files in the \code{summary_plots} subdirectory of a BISCUT output directory.}
+
+\item{title}{Plot title}
+
+\item{xlab}{X-axis label}
+
+\item{chromosome_coordinates}{Coordinates of chromosomal p and q arms. See \code{do_biscut()}.}
+
+\item{name}{description}
 }
 \value{
 A ggplot, or NULL if the plot_data is empty.

@@ -37,7 +37,6 @@ Config/reticulate:
       list(package = "os"),
       list(package = "pandas"),
       list(package = "numpy"),
-      list(package = "multiprocessing"),
       list(package = "operator"),
       list(package = "itertools"),
       list(package = "fnmatch")

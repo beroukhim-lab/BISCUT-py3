@@ -1,4 +1,8 @@
 #' Filter out largest/smallest tel/cent events
+#' @param df breakpoints data.frame
+#' @param telcent_thres Threshold for filtering out events that are very small or vary large. Events
+#'   that cover a fraction of the arm that is less than telcent_thres or greater than
+#'   (1-telcent_thres) are removed.
 filter_big_small <- function(df, telcent_thres = 1e-3) {
   df <- df[df$percent>=telcent_thres,]
   df <- df[df$percent<=(1-telcent_thres),]

@@ -11,7 +11,6 @@ __author__ = 'jshih'
 
 import pandas as pd
 import os
-import multiprocessing as mp
 
 
 #for given length n that is 2 or greater, give list of tuples between each element

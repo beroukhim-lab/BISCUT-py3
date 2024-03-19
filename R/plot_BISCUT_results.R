@@ -13,15 +13,20 @@
 #' @import ggplot2
 #' @param plot_data A data.table (or data.frame) with peak plotting information. For format, see the
 #'   text files in the \code{summary_plots} subdirectory of a BISCUT output directory.
+#' @param title Plot title
+#' @param xlab X-axis label
+#' @param name description
+#' @param chromosome_coordinates Coordinates of chromosomal p and q arms. See \code{do_biscut()}.
 #' @return A ggplot, or NULL if the plot_data is empty.
 #' @export
-plot_BISCUT_results <- function(plot_data, title, xlab, abslocs = get_chromosome_coordinates()) {
+plot_BISCUT_results <- function(plot_data, title, xlab, chromosome_coordinates = get_chromosome_coordinates()) {
   if(! is.data.frame(plot_data)) {
     stop('Expected plot_data to be data.frame')
   }
   if(nrow(plot_data) == 0) {
     return(NULL)
   }
+  abslocs = validate_chr_coordinates(chromosome_coordinates)
   df = plot_data
   gg = ggplot() + theme_classic() + ggtitle(title) + theme(plot.title = element_text(hjust = 0.5)) +
     scale_y_continuous(name="Chromosomes", expand = c(0.01,10000), 

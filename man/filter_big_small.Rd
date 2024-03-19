@@ -6,6 +6,13 @@
 \usage{
 filter_big_small(df, telcent_thres = 0.001)
 }
+\arguments{
+\item{df}{breakpoints data.frame}
+
+\item{telcent_thres}{Threshold for filtering out events that are very small or vary large. Events
+that cover a fraction of the arm that is less than telcent_thres or greater than
+(1-telcent_thres) are removed.}
+}
 \description{
 Filter out largest/smallest tel/cent events
 }
