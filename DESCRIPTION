@@ -1,0 +1,40 @@
+Package: BISCUT
+Title: What the Package Does (One Line, Title Case)
+Version: 1.2.0.9000
+Authors@R: 
+    person("First", "Last", , "first.last@example.com", role = c("aut", "cre"),
+           comment = c(ORCID = "YOUR-ORCID-ID"))
+Description: What the package does (one paragraph).
+Encoding: UTF-8
+License: GPL-2
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.2.3
+Depends: 
+    R (>= 4.1)
+Imports:
+    cowplot,
+    data.table,
+    fitdistrplus,
+    ggplot2,
+    glue,
+    graphics,
+    grDevices,
+    lifecycle,
+    methods,
+    pbapply,
+    reticulate,
+    rlang,
+    stats,
+    stringr,
+    truncdist,
+    utils
+Suggests: 
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3
+Config/reticulate:
+  list(
+    packages = list(
+      list(package = "pandas"),
+      list(package = "numpy")
+    )
+  )
