@@ -65,7 +65,7 @@ do_arm_gistic <- function(arm, direc, telcent, mode, ci,qval_thres, telcent_thre
     stop('Could not find breakpoint file ending in ', curr_file_pattern, ' in breakpoint_file_dir.')
   }
   probes <- read.table(probefilename,sep='\t',header=T,stringsAsFactors = F,fill=T)
-  probes <- filter_big_small(probes)
+  probes <- filter_big_small(probes, telcent_thres = telcent_thres)
   tabprobes <- tablify(probes,chromosome,pq,telcent,F)
   probelist <- as.numeric(as.character(tabprobes$Var1))
   
@@ -120,7 +120,7 @@ do_arm_gistic <- function(arm, direc, telcent, mode, ci,qval_thres, telcent_thre
     #   results_left = Search left (list)
     #   results_right = Search right (list)
     #   append results to peak list
-    # Return peak list
+    # Return peak list (and also list of plots)
     # 
     
     # Will stop early when insufficient samples
@@ -159,7 +159,7 @@ do_arm_gistic <- function(arm, direc, telcent, mode, ci,qval_thres, telcent_thre
     p_ks <- theks$p
     stat_ks <- theks$statistic[['D']]
     
-    iteration_name <- paste(arm,direc,telcent,prefix,toString(iteration),sep='_')
+    peak_id <- paste(arm,direc,telcent,prefix,toString(iteration),sep='_')
     parent_name <- paste(arm,direc,telcent,parent_peak,toString(iteration - 1),sep='_')
 
     #find number of peak
@@ -473,40 +473,28 @@ do_arm_gistic <- function(arm, direc, telcent, mode, ci,qval_thres, telcent_thre
     
     filteredgenelocs$n_right <- length(rightx)
     filteredgenelocs$n_left <- length(leftx)
-    filteredgenelocs$peak_id = iteration_name
+    filteredgenelocs$peak_id = peak_id
     filteredgenelocs$parent = parent_name
     filteredgenelocs$code = prefix
-    
-    prior_peaks[[prefix]] <- c(left_boundary, right_boundary)
-    
-    # Produce peak plots
     df1$x = x
     peak_pos = df1$percent[peak_index]
-    title <- paste(arm, direc,telcent,selection,prefix,toString(ci),'iteration',toString(iteration),sep=' ')
-    title = paste0(title,'\nks p-value = ',toString(signif(p_ks, 3)))
+    filteredgenelocs$Peak.Position.1 = peak_pos
+    filteredgenelocs$Peak.Position = unfractionize(peak_pos, chromosome, pq, telcent)
+    filteredgenelocs$search_lowlim = lowlim
+    filteredgenelocs$search_highlim = highlim
     
-    p1 = ggplot(df1, aes(x = percent, y = rownamez)) + geom_point(size = .75) + xlab('pSCNA Length') + ylab('Ranked Tumors') + ggtitle(title) +
-      geom_point(aes(x = x, y = rownamez), shape = '.', size = 1) + 
-      geom_vline(xintercept = peak_pos) + theme_classic()
-    
-    p2 = ggplot(data= df1, aes(x = percent, y = dis)) + geom_point(size = .75) +
-      xlab('pSCNA Length') + ylab('Distance from background') + 
-      scale_x_continuous(limits = c(lowlim, highlim)) + 
-      geom_vline(xintercept = peak_pos) +
-      geom_vline(xintercept = left_boundary, lty = 'dashed') + 
-      geom_vline(xintercept = right_boundary, lty = 'dashed') + theme_classic()
-    
-    peak_plot_file = paste0(results_dir,'/peak_plots/', arm,'_',direc,'_',telcent,'_',prefix,'_',
-                            toString(ci),'_iter',toString(iteration),'.pdf')
-    peak_plots = cowplot::plot_grid(p1, p2, nrow = 2) 
-    cowplot::save_plot(peak_plot_file, peak_plots)
+    prior_peaks[[prefix]] <- c(left_boundary, right_boundary)
     
     iteration = iteration + 1
     left_results = find_peaks(leftright = 'left', df1 = leftdf, lims = llims, x = leftx, prior_peaks = prior_peaks, prefix = prefix, iteration = iteration)
     right_results = find_peaks(leftright = 'right', df1 = rightdf,lims = rlims, x = rightx, prior_peaks = prior_peaks, prefix = prefix, iteration = iteration)
     
-    
-    return(c(left_results, list(as.data.table(filteredgenelocs)), right_results))
+    left_peaks = left_results[[1]]
+    right_peaks = right_results[[1]]
+    all_peaks = c(left_peaks, list(as.data.table(filteredgenelocs)), right_peaks)
+    all_df = c(left_results[[2]], setNames(list(df1[, c('percent', 'dis', 'x')]), peak_id), right_results[[2]])
+    return(list(all_peaks, all_df))
   }
-  return(rbindlist(find_peaks(leftright = NULL, df1 = df1, lims = c(0, 1), x = x, prior_peaks = list(), prefix = NULL, iteration = 1)))
+  output = find_peaks(leftright = NULL, df1 = df1, lims = c(0, 1), x = x, prior_peaks = list(), prefix = NULL, iteration = 1)
+  return(list(rbindlist(output[[1]]), output[[2]]))
 }

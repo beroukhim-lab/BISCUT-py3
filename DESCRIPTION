@@ -34,11 +34,7 @@ Config/testthat/edition: 3
 Config/reticulate:
   list(
     packages = list(
-      list(package = "os"),
       list(package = "pandas"),
-      list(package = "numpy"),
-      list(package = "operator"),
-      list(package = "itertools"),
-      list(package = "fnmatch")
+      list(package = "numpy")
     )
   )

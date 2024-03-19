@@ -62,6 +62,15 @@ table is used; see \code{get_gene_locations()}.}
 
 \item{seed}{Default NULL; supply an integer seed to make numerical output reproducible.}
 }
+\value{
+A list containing BISCUT output:
+\itemize{
+\item peak_info: A table with one row describing each significant peak.
+\item genes_by_peak: A table identifying which genes fall in each peak (and the coordinates of the genes).
+\item background_fits: A list containing fitted background length distributions for each event type (centromeric/telomeric amplifications/deletions).
+\item peak_plot_data: The data used to make the peak plots (saved to BISCUT results directory).
+}
+}
 \description{
 Run BISCUT analysis on processed arm breakpoint files
 }

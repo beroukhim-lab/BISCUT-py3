@@ -40,6 +40,13 @@
 #' @param gene_locations Gene locations for mapping genes to peaks in the output. By default, an hg19-based
 #' table is used; see \code{get_gene_locations()}.
 #' @param seed Default NULL; supply an integer seed to make numerical output reproducible.
+#' @return A list containing BISCUT output: 
+#' \itemize{
+#' \item peak_info: A table with one row describing each significant peak.
+#' \item genes_by_peak: A table identifying which genes fall in each peak (and the coordinates of the genes).
+#' \item background_fits: A list containing fitted background length distributions for each event type (centromeric/telomeric amplifications/deletions).
+#' \item peak_plot_data: The data used to make the peak plots (saved to BISCUT results directory).
+#' }
 #' @export
 do_biscut = function(breakpoint_file_dir, results_dir, use_precalculated_background = FALSE,
                      telcent_thres = 1e-3, ci = .95, n_bootstrap = 1000, qval_thres = .05, cores = 1,
@@ -186,7 +193,7 @@ do_biscut = function(breakpoint_file_dir, results_dir, use_precalculated_backgro
                                                  genelocs = genelocs,
                                                  seed = seed)
                                  }, cl = cores)
-  which_failed = which(! sapply(results, is.data.table))
+  which_failed = which(! sapply(results, is.list))
   if(length(which_failed) > 0) {
     warning(paste0('Run(s) failed. Attempting to return debugging information.\n',
                    'Try running a failing arm with cores = 1 for more a detailed error message.'))
@@ -200,7 +207,10 @@ do_biscut = function(breakpoint_file_dir, results_dir, use_precalculated_backgro
     }
     return(failed_runs)
   }
-  results = rbindlist(results)
+  
+  peak_plot_data = unlist(lapply(results, '[[', 2), recursive = F)
+  peak_plot_data = peak_plot_data[! sapply(peak_plot_data, is.null)] # When a valid peak isn't found, there's no plot data
+  results = rbindlist(lapply(results, '[[', 1))
 
   # Produce a single file of p-values, KS_pvalues (keeping original column names for this file)
   pvalues = unique(results[, .(peak_id, one_samp_p = ks_p, ks_stat)])
@@ -236,6 +246,7 @@ do_biscut = function(breakpoint_file_dir, results_dir, use_precalculated_backgro
   results = results[order(-combined_sig)]
   
   fwrite(results, paste0(results_dir, '/all_BISCUT_results.txt'), sep = "\t")
+  
   
   # Take only most significant result for each gene, by type
   gene_rank = results[order(combined_sig, decreasing = T), .SD[!duplicated(Gene)], .SDcols = c('Gene', 'combined_sig'), 
@@ -350,15 +361,48 @@ do_biscut = function(breakpoint_file_dir, results_dir, use_precalculated_backgro
                        base_width = 8, base_height = 6)
   }
   
-  finished_processing = TRUE
-  
   peak_info = results[! duplicated(peak_id), .(peak_id, peak_interval, type_of_selection, combined_sig, 
-                                   Chr, Peak.Start, Peak.End, Peak.Start.1, Peak.End.1,
+                                   Chr, Peak.Start, Peak.Position, Peak.End, Peak.Start.1, Peak.Position.1, Peak.End.1,
                                    n_events, n_right, n_left, code, negpos, iter, arm, direction, telcent,
-                                   ks_stat, log10_ks_p, log10_ksby)]
-  gene_cols = setdiff(names(results), c(names(peak_info), c('conf', 'ksby', 'ks_p')))
+                                   ks_stat, ks_p, log10_ks_p, log10_ksby, search_lowlim, search_highlim)]
+  gene_cols = setdiff(names(results), c(names(peak_info), c('conf', 'ksby')))
   genes_by_peak = results[, .SD, .SDcols = c('peak_id', gene_cols, 'combined_sig')][order(-combined_sig, Start)]
   setnames(genes_by_peak, 'combined_sig', 'peak_combined_sig')
-  return(list(peaks = peak_info, genes_by_peak = genes_by_peak, background_fits = fit_by_type))
+  
+  # Produce peak plots
+  # Omit peaks that were removed by significance filtering
+  message("Making peak plots...")
+  peak_plot_data = peak_plot_data[peak_info$peak_id]
+  for(i in 1:length(peak_plot_data)) {
+    curr_info = peak_info[names(peak_plot_data)[i], on = 'peak_id']
+    curr_info[, selection := ifelse(negpos == 'n', 'negative', 'positive')]
+    title = curr_info[, paste0(paste(arm, direction, telcent, selection, code, ci,'iteration', iter, sep=' '),
+                               '\nks p-value = ', signif(ks_p, 3))]
+    peak_pos = curr_info$Peak.Position.1
+    curr_data = peak_plot_data[[i]]
+    curr_data$rownamez = 1:nrow(curr_data)
+    p1 = ggplot(curr_data, aes(x = percent, y = rownamez)) + geom_point(size = .75) + xlab('pSCNA Length') + ylab('Ranked Tumors') + ggtitle(title) +
+         geom_point(aes(x = x, y = rownamez), shape = '.', size = 1) + 
+         geom_vline(xintercept = peak_pos) + theme_classic()
+    lowlim = curr_info$search_lowlim
+    highlim = curr_info$search_highlim
+    left_boundary = curr_info$Peak.Start.1
+    right_boundary = curr_info$Peak.End.1
+    p2 = ggplot(data= curr_data, aes(x = percent, y = dis)) + geom_point(size = .75) +
+      xlab('pSCNA Length') + ylab('Distance from background') + 
+      scale_x_continuous(limits = c(lowlim, highlim)) + 
+      geom_vline(xintercept = peak_pos) +
+      geom_vline(xintercept = left_boundary, lty = 'dashed') + 
+      geom_vline(xintercept = right_boundary, lty = 'dashed') + theme_classic()
+    peak_plots = cowplot::plot_grid(p1, p2, nrow = 2) 
+    plot_file = paste0(results_dir, '/peak_plots/', 
+                       curr_info[, .(paste0(arm, '_', direction, '_', telcent, '_',
+                                            code, '_', ci, '_iter', iter, '.pdf'))])
+    cowplot::save_plot(plot_file, peak_plots)
+  }
+  peak_info$ks_p = NULL # keeping log10_ks_p
+  finished_processing = TRUE
+  return(invisible(list(peaks = peak_info, genes_by_peak = genes_by_peak, 
+                        background_fits = fit_by_type, peak_plot_data = peak_plot_data)))
 }
 
